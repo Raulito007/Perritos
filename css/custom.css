@@ -1,0 +1,44 @@
+/* Estilos personalizados adicionales */
+
+.nav-btn {
+    @apply bg-white text-gray-800 border-2 border-transparent;
+}
+
+.nav-btn.active {
+    @apply bg-blue-600 text-white border-blue-600;
+}
+
+.nav-btn:hover {
+    @apply border-blue-600;
+}
+
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-in;
+}
+
+/* Estilos para el modal */
+#postModal {
+    animation: fadeIn 0.2s ease-in;
+}
+
+/* Estilos para mensajes de error */
+#error-container {
+    animation: fadeIn 0.3s ease-in;
+}

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="estilos.css">
+    <title>AJAX</title>
+</head>
+<body>
+    <h1>Pruebas con JSONPlaceholder</h1>
+    <button id="loadPosts">Cargar posts</button>
+    <button id="loadUsers">Cargar usuarios</button>
+    <button id="createPost">Crear post (POST)</button>
+    <button id="updatePost">Actualizar post ID 1 (PUT)</button>
+    <button id="deletePost">Eliminar post ID 1 (DELETE)</button>
+    <div id="output" style="margin-top:1em;"></div>
+
+    <script>
+        $(function() {
+            function showError(message) {
+                $('#output').html('<p style="color:red;">' + message + '</p>');
+            }
+
+            $('#loadPosts').on('click', function() {
+                $.ajax({
+                    url: 'https://jsonplaceholder.typicode.com/posts',
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function(data) {
+                        var html = '';
+                        data.forEach(function(post) {
+                            html += '<div class="post" data-id="' + post.id + '">';
+                            html += '<h3>' + post.title + '</h3>';
+                            html += '<p>' + post.body + '</p>';
+                            html += '<button class="editPost">Editar</button>';
+                            html += '<button class="deletePost">Borrar</button>';
+                            html += '</div>';
+                        });
+                        $('#output').html(html);
+                    },
+
+                    error: function() {
+                        showError('Error al cargar los posts.');
+                    }
+                });
+            });
+
+            $('#loadUsers').on('click', function() {
+                $.ajax({
+                    url: 'https://jsonplaceholder.typicode.com/users',
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function(data) {
+                        var html = '<ul>';
+                        data.forEach(function(user) {
+                            html += '<li>' + user.name + ' (' + user.email + ')</li>';
+                        });
+                        html += '</ul>';
+                        $('#output').html(html);
+                    },
+                    error: function() {
+                        showError('Error al cargar los usuarios.');
+                    }
+                });
+            });
+
+            // POST: create a new post
+            $('#createPost').on('click', function() {
+                $.ajax({
+                    url: 'https://jsonplaceholder.typicode.com/posts',
+                    method: 'POST',
+                    contentType: 'application/json; charset=UTF-8',
+                    data: JSON.stringify({ title: 'Foo', body: 'Bar', userId: 1 }),
+                    success: function(data) {
+                        $('#output').html('<pre>' + JSON.stringify(data, null, 2) + '</pre>');
+                    },
+                    error: function() {
+                        showError('Error al crear el post.');
+                    }
+                });
+            });
+
+            // PUT: update post with ID 1
+            $('#updatePost').on('click', function() {
+                $.ajax({
+                    url: 'https://jsonplaceholder.typicode.com/posts/1',
+                    method: 'PUT',
+                    contentType: 'application/json; charset=UTF-8',
+                    data: JSON.stringify({ id: 1, title: 'Título actualizado', body: 'Contenido actualizado', userId: 1 }),
+                    success: function(data) {
+                        $('#output').html('<pre>' + JSON.stringify(data, null, 2) + '</pre>');
+                    },
+                    error: function() {
+                        showError('Error al actualizar el post.');
+                    }
+                });
+            });
+
+            // DELETE: delete post with ID 1
+            $('#deletePost').on('click', function() {
+                $.ajax({
+                    url: 'https://jsonplaceholder.typicode.com/posts/1',
+                    method: 'DELETE',
+                    success: function() {
+                        $('#output').html('<p>Post eliminado (respuesta vacía).</p>');
+                    },
+                    error: function() {
+                        showError('Error al eliminar el post.');
+                    }
+                });
+            });
+
+            // delegation for dynamically added edit/delete buttons next to posts
+            $('#output').on('click', '.editPost', function() {
+                var postId = $(this).closest('.post').data('id');
+                // Fetch post and show editing form
+                $.ajax({
+                    url: 'https://jsonplaceholder.typicode.com/posts/' + postId,
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function(post) {
+                        var formHtml = '<h3>Editar post ' + postId + '</h3>';
+                        formHtml += '<input type="text" id="editTitle" value="' + post.title + '"><br>';
+                        formHtml += '<textarea id="editBody">' + post.body + '</textarea><br>';
+                        formHtml += '<button id="saveEdit">Guardar</button>';
+                        $('#output').html(formHtml);
+                        $('#saveEdit').on('click', function() {
+                            var updated = {
+                                id: postId,
+                                title: $('#editTitle').val(),
+                                body: $('#editBody').val(),
+                                userId: post.userId
+                            };
+                            $.ajax({
+                                url: 'https://jsonplaceholder.typicode.com/posts/' + postId,
+                                method: 'PUT',
+                                contentType: 'application/json; charset=UTF-8',
+                                data: JSON.stringify(updated),
+                                success: function(resp) {
+                                    $('#output').html('<pre>' + JSON.stringify(resp, null, 2) + '</pre>');
+                                },
+                                error: function() {
+                                    showError('Error al guardar la edición.');
+                                }
+                            });
+                        });
+                    },
+                    error: function() {
+                        showError('Error al obtener el post para editar.');
+                    }
+                });
+            });
+
+            $('#output').on('click', '.deletePost', function() {
+                var postId = $(this).closest('.post').data('id');
+                $.ajax({
+                    url: 'https://jsonplaceholder.typicode.com/posts/' + postId,
+                    method: 'DELETE',
+                    success: function() {
+                        showError('Post ' + postId + ' eliminado.');
+                        $('#loadPosts').trigger('click');
+                    },
+                    error: function() {
+                        showError('Error al borrar el post.');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="estilos.css">
+    <title>API Dog</title>
+</head>
+<body>
+    <h1>Pruebas con dog.ceo</h1>
+    <button id="loadDogs">Obtener listado de razas</button>
+
+    <div id="output" style="margin-top:1em;"></div>
+
+    <script>
+        $(function() {
+            // usar dog.ceo API
+            // no requiere clave, los endpoints básicos:
+            //   lista: https://dog.ceo/api/breeds/list/all
+            //   aleatorio: https://dog.ceo/api/breeds/image/random
+            var baseUrl = 'https://dog.ceo/api';
+            
+            function withKey(settings) {
+                // sin autenticación necesaria, devuelve settings sin cambios
+                return settings;
+            }
+
+            function showError(message) {
+                $('#output').html('<p style="color:red;">' + message + '</p>');
+            }
+
+            $('#loadDogs').on('click', function() {
+                $.ajax(withKey({
+                    url: baseUrl + '/breeds/list/all',
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function(resp) {
+                        // resp.message es un objeto {raza: [subrazas...]}
+                        var html = '';
+                        Object.keys(resp.message).forEach(function(breed) {
+                            html += '<div class="post" data-breed="' + breed + '">';
+                            html += '<h3>' + breed + '</h3>';
+                            html += '<img class="dog-img" src="" alt="' + breed + '">';
+                            html += '</div>';
+                        });
+                        $('#output').html(html);
+
+                        // ahora solicitar imagen para cada raza
+                        $('#output .post').each(function() {
+                            var container = $(this);
+                            var breedName = container.data('breed');
+                            $.ajax({
+                                url: baseUrl + '/breed/' + breedName + '/images/random',
+                                method: 'GET',
+                                dataType: 'json',
+                                success: function(imgResp) {
+                                    container.find('img.dog-img').attr('src', imgResp.message);
+                                },
+                                error: function() {
+                                    // dejar imagen vacía si falla
+                                }
+                            });
+                        });
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.error('GET breeds', this.url, textStatus, errorThrown, jqXHR.responseText);
+                        showError('Error al obtener listado. Mira la consola.');
+                    }
+                }));
+            });
+
+
+
+
+
+            $('#output').on('click', '.editPost', function() {
+                var id = $(this).closest('.post').data('id');
+                $.ajax({
+                    url: baseUrl + '/' + id,
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function(dog) {
+                        var formHtml = '<h3>Editar perro ' + id + '</h3>';
+                        formHtml += '<input type="text" id="editName" value="' + dog.name + '"><br>';
+                        formHtml += '<input type="text" id="editBreed" value="' + (dog.breed||'') + '"><br>';
+                        formHtml += '<button id="saveEdit">Guardar</button>';
+                        $('#output').html(formHtml);
+                        $('#saveEdit').on('click', function() {
+                            var updated = {
+                                id: id,
+                                name: $('#editName').val(),
+                                breed: $('#editBreed').val()
+                            };
+                            $.ajax({
+                                url: baseUrl + '/' + id,
+                                method: 'PUT',
+                                contentType: 'application/json; charset=UTF-8',
+                                data: JSON.stringify(updated),
+                                success: function(resp) {
+                                    $('#output').html('<pre>' + JSON.stringify(resp, null, 2) + '</pre>');
+                                },
+                                error: function(jqXHR, textStatus, errorThrown) {
+                                    console.error('PUT save', this.url, textStatus, errorThrown, jqXHR.responseText);
+                                    showError('Error al guardar la edición. Revisa la consola.');
+                                }
+                            });
+                        });
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.error('GET for edit', this.url, textStatus, errorThrown, jqXHR.responseText);
+                        showError('Error al obtener el perro para editar. Revisa la consola.');
+                    }
+                });
+            });
+
+            $('#output').on('click', '.deletePost', function() {
+                var id = $(this).closest('.post').data('id');
+                $.ajax({
+                    url: baseUrl + '/' + id,
+                    method: 'DELETE',
+                    success: function() {
+                        showError('Perro ' + id + ' eliminado.');
+                        $('#loadDogs').trigger('click');
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.error('DELETE dynamic', this.url, textStatus, errorThrown, jqXHR.responseText);
+                        showError('Error al borrar el perro. Revisa la consola.');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

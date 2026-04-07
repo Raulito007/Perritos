@@ -1,0 +1,60 @@
+body {
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1em;
+    background-color: #cac02f;
+    text-align: center;
+}
+
+h1 {
+    color: #333;
+}
+
+button {
+    margin: 0.5em;
+    padding: 0.5em 1em;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+#output {
+    text-align: left;
+    margin-top: 1em;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.post {
+    border: 1px solid #ccc;
+    padding: 0.5em;
+    margin: 0.5em;
+    background-color: #ffe6ff; /* magenta claro */
+    text-align: center; /* center inline content */
+    flex: 0 1 calc(20% - 1em); /* roughly five per row, accounting for margins */
+    box-sizing: border-box;
+}
+
+.post h3 {
+    text-transform: uppercase;
+    margin: 0.3em 0;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    padding: 0.25em 0;
+    border-bottom: 1px solid #eee;
+}
+
+.dog-img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    display: block;
+    margin: 0.5em auto;
+}

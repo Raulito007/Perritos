@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐕 Animales y Posts</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="css/custom.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-6 shadow-lg">
+        <div class="container mx-auto px-4">
+            <h1 class="text-4xl font-bold">🐕 Animales y Posts</h1>
+            <p class="text-blue-100 mt-2">Explora razas de perros y gestiona posts</p>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="bg-gray-100 border-b border-gray-200 sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex gap-4 justify-center py-4 flex-wrap">
+                <button id="navDogs" class="nav-btn active px-6 py-2 rounded-lg font-semibold transition">
+                    🐕 Razas de Perros
+                </button>
+                <button id="navPosts" class="nav-btn px-6 py-2 rounded-lg font-semibold transition">
+                    📝 Posts
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Error Container -->
+        <div id="error-container" class="mb-4"></div>
+
+        <!-- Loading Spinner Component -->
+        <div id="loadingSpinner" class="hidden fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-40">
+            <div class="bg-white rounded-lg shadow-xl p-8 flex flex-col items-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-4 border-gray-300 border-t-blue-600 mb-4"></div>
+                <p id="spinnerText" class="text-gray-700 font-semibold">Cargando...</p>
+            </div>
+        </div>
+
+        <!-- Dogs Section -->
+        <section id="dogsSection" class="section-content">
+            <div class="flex justify-between items-center mb-6 flex-wrap gap-4">
+                <h2 class="text-3xl font-bold text-gray-800">Razas de Perros</h2>
+                <button id="loadDogsBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition">
+                    Cargar Razas
+                </button>
+            </div>
+            <div id="dogsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Razas se cargarán aquí -->
+            </div>
+        </section>
+
+        <!-- Posts Section (Hidden by default) -->
+        <section id="postsSection" class="section-content hidden">
+            <div class="flex justify-between items-center mb-6 flex-wrap gap-4">
+                <h2 class="text-3xl font-bold text-gray-800">Posts</h2>
+                <div class="flex gap-4 flex-wrap">
+                    <button id="loadPostsBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition">
+                        Cargar Posts
+                    </button>
+                    <button id="createPostBtn" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-semibold transition">
+                        + Crear Post
+                    </button>
+                </div>
+            </div>
+            <div id="postsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Posts se cargarán aquí -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal para Crear/Editar Post -->
+    <div id="postModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-md mx-4">
+            <h3 id="modalTitle" class="text-2xl font-bold mb-4">Crear Post</h3>
+            <form id="postForm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-semibold mb-2">Título</label>
+                    <input type="text" id="postTitle" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500" placeholder="Ingresa el título">
+                    <span id="titleError" class="text-red-500 text-sm mt-1 hidden"></span>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 font-semibold mb-2">Contenido</label>
+                    <textarea id="postBody" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500 h-32" placeholder="Ingresa el contenido"></textarea>
+                    <span id="bodyError" class="text-red-500 text-sm mt-1 hidden"></span>
+                </div>
+                <div class="flex gap-4">
+                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition">
+                        Guardar
+                    </button>
+                    <button type="button" id="closeModalBtn" class="flex-1 bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold transition">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white text-center py-4 mt-8">
+        <p>© 2024 Animales y Posts. Datos de <a href="https://dog.ceo" class="text-blue-400 hover:underline" target="_blank">dog.ceo</a> y <a href="https://jsonplaceholder.typicode.com" class="text-blue-400 hover:underline" target="_blank">JSONPlaceholder</a></p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/validators.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/events.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
